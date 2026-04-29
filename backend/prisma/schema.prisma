@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String
+  password    String
+  houseId     String?
+  house       House?       @relation(fields: [houseId], references: [id])
+  mealEntries MealEntry[]
+  createdAt   DateTime     @default(now())
+}
+
+model House {
+  id          String       @id @default(uuid())
+  name        String
+  inviteCode  String       @unique
+  createdById String
+  members     User[]
+  bazaarItems BazaarItem[]
+  expenses    Expense[]
+  budgets     Budget[]
+  createdAt   DateTime     @default(now())
+}
+
+model MealEntry {
+  id      String   @id @default(uuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id])
+  date    DateTime @default(now())
+  isOn    Boolean  @default(true)
+  month   String
+}
+
+model BazaarItem {
+  id        String   @id @default(uuid())
+  houseId   String
+  house     House    @relation(fields: [houseId], references: [id])
+  item      String
+  taka      Float
+  addedById String
+  date      DateTime @default(now())
+  month     String
+}
+
+model Expense {
+  id          String @id @default(uuid())
+  houseId     String
+  house       House  @relation(fields: [houseId], references: [id])
+  month       String
+  rent        Float  @default(0)
+  electricity Float  @default(0)
+  gas         Float  @default(0)
+  water       Float  @default(0)
+}
+
+model Budget {
+  id      String  @id @default(uuid())
+  houseId String
+  house   House   @relation(fields: [houseId], references: [id])
+  year    String
+  month   String?
+  amount  Float
+  type    String
+}
